@@ -1,0 +1,48 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ subject }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Responsive for mobile -->
+    <link rel="stylesheet" type="text/css" href="{% static 'experiment/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <form method="post">
+            {% csrf_token %}
+            <h1>{{ subject }}</h1>
+            <p>{{ question }}</p>
+
+            {% if subject == "Linda Problem" and group == 'B' %}
+                <!-- Special case for Linda Problem Group B: Two number input fields -->
+                <label for="bank_teller_number">Linda is a bank teller:</label>
+                <input type="number" name="bank_teller_number" id="bank_teller_number" required>
+
+                <label for="feminist_number">Linda is a bank teller and active in the feminist movement:</label>
+                <input type="number" name="feminist_number" id="feminist_number" required>
+
+            {% else %}
+                <!-- Default options for other subjects and Linda Problem Group A -->
+                {% if multiple_choice %}
+                    {% for option in options %}
+                        <input type="checkbox" name="answer" value="{{ option }}" id="option_{{ forloop.counter }}">
+                        <label for="option_{{ forloop.counter }}" class="option-button">{{ option }}</label>
+                    {% endfor %}
+                {% else %}
+                    {% for option in options %}
+                        <input type="radio" name="answer" value="{{ option }}" id="option_{{ forloop.counter }}" required>
+                        <label for="option_{{ forloop.counter }}" class="option-button">{{ option }}</label>
+                    {% endfor %}
+                {% endif %}
+
+                {% if number_input %}
+                    <label for="number">Enter a number:</label>
+                    <input type="number" name="number" id="number" required>
+                {% endif %}
+            {% endif %}
+
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+</body>
+</html>

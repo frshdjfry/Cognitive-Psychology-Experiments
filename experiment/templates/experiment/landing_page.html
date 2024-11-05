@@ -1,0 +1,23 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to the Experiment</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'experiment/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="form" style="width: 90%; max-width: 400px; text-align: center;">
+            <h1>Welcome to the Reasoning Experiment</h1>
+            <p>Thank you for participating in this study. When you're ready, please click the button below to start.</p>
+            
+            <form action="{% url 'wason_task' %}" method="get">
+                {% csrf_token %}
+                <button type="submit">Start Experiment</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
