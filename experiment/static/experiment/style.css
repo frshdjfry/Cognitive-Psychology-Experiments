@@ -117,3 +117,14 @@ button[type="submit"]:hover {
     background-color: #333;
     color: #f0f0f0;
 }
+input[type="text"] {
+    width: 100%;
+    padding: 15px;
+    font-size: 1em;
+    margin: 10px 0;
+    border: 2px solid #f0f0f0;
+    border-radius: 2px;
+    background-color: transparent;
+    color: #f8f8f8;
+    box-sizing: border-box;
+}

@@ -15,3 +15,14 @@ class Response(models.Model):
     response_time = models.DurationField(null=True, blank=True)  # New field for time tracking
     created_at = models.DateTimeField(auto_now_add=True)
 
+
+class TwoFourSixFinalGuess(models.Model):
+    """Model to store the final guess for the 2-4-6 experiment."""
+    final_guess = models.CharField(max_length=255, blank=True, null=True)
+
+class TwoFourSixSequenceAttempt(models.Model):
+    """Model to store each sequence attempt in the 2-4-6 experiment."""
+    final_guess = models.ForeignKey(TwoFourSixFinalGuess, on_delete=models.CASCADE)
+    sequence = models.CharField(max_length=20)  # Store as a string, e.g., "2,4,6"
+    fits_rule = models.BooleanField()
+    created_at = models.DateTimeField(auto_now_add=True)

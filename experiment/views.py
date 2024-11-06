@@ -1,13 +1,8 @@
 from datetime import datetime
-
-from django.shortcuts import render
-
-# Create your views here.
-import random
-from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from .models import Participant, Response
+from .models import Participant, Response, TwoFourSixFinalGuess, TwoFourSixSequenceAttempt
 from django.utils import timezone
+from django.shortcuts import render, redirect
+
 
 def landing_page(request):
     # Assign unique ID and group
@@ -178,6 +173,53 @@ def anchoring_bias(request):
     })
 
 
+def check_two_four_six_rule(sequence):
+    """Check if the sequence fits the hidden rule (any three positive increasing numbers)."""
+    return sequence[0] > 0 and sequence[1] > 0 and sequence[2] > 0 and sequence[0] < sequence[1] < sequence[2]
+
+
+def two_four_six_experiment(request):
+    # Get or create a final guess instance for the participant
+    if 'final_guess_id' not in request.session:
+        final_guess = TwoFourSixFinalGuess.objects.create()
+        request.session['final_guess_id'] = final_guess.id
+    else:
+        final_guess = TwoFourSixFinalGuess.objects.get(id=request.session['final_guess_id'])
+
+    message = None  # Message to show whether the sequence fits the rule
+
+    if request.method == 'POST':
+        # Handle sequence submission
+        if 'submit_sequence' in request.POST:
+            # Get the sequence values from the form
+            sequence = [
+                int(request.POST['num1']),
+                int(request.POST['num2']),
+                int(request.POST['num3'])
+            ]
+            fits_rule = check_two_four_six_rule(sequence)
+            color = "green" if fits_rule else "red"
+            message = f"<span style='color: {color};'>The sequence {sequence} {'follows' if fits_rule else 'does not follow'} the rule.</span>"
+
+            # Save the sequence attempt
+            TwoFourSixSequenceAttempt.objects.create(
+                final_guess=final_guess,
+                sequence=",".join(map(str, sequence)),
+                fits_rule=fits_rule
+            )
+
+        # Handle final guess submission
+        elif 'submit_guess' in request.POST:
+            final_guess.final_guess = request.POST['final_guess']
+            final_guess.save()
+            return redirect('thanks_page')  # Redirect to the thanks page after final guess
+
+    return render(request, 'experiment/two_four_six_experiment.html', {
+        'message': message
+    })
+
+
 def thanks_page(request):
     return render(request, 'experiment/thanks.html')
+
 

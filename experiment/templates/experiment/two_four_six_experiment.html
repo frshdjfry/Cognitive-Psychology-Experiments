@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>2-4-6 Experiment</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{% static 'experiment/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="form" style="width: 90%; max-width: 400px; text-align: center;">
+            <h1>2-4-6 Experiment</h1>
+            <p>The hidden rule applies to sequences of numbers. Try submitting different sequences to figure out the rule. As a hint, 2-4-6 is a valid sequence.</p>
+            
+            {% if message %}
+                <p>{{ message|safe }}</p>  <!-- Display message based on the rule check -->
+            {% endif %}
+
+            <!-- Form to submit sequence -->
+            <form method="post">
+                {% csrf_token %}
+                <label for="num1">Number 1:</label>
+                <input type="number" name="num1" required>
+                
+                <label for="num2">Number 2:</label>
+                <input type="number" name="num2" required>
+                
+                <label for="num3">Number 3:</label>
+                <input type="number" name="num3" required>
+
+                <button type="submit" name="submit_sequence">Submit Sequence</button>
+            </form>
+
+            <!-- Form to submit final guess -->
+            <form method="post" style="margin-top: 20px;">
+                {% csrf_token %}
+                <label for="final_guess">Your final guess about the rule:</label>
+                <input type="text" name="final_guess" required>
+                
+                <button type="submit" name="submit_guess">Submit Final Guess</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

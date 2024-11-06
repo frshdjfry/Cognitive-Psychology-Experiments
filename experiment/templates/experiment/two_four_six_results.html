@@ -1,0 +1,38 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>2-4-6 Experiment Results</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Responsive for mobile -->
+    <link rel="stylesheet" type="text/css" href="{% static 'experiment/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="form" style="width: 90%; max-width: 400px; text-align: center;">
+            <h1>2-4-6 Experiment Results</h1>
+            <img src="data:image/png;base64,{{ chart }}" alt="Correct vs Incorrect Sequence Attempts" style="width:100%;">
+
+            <!-- Table of Final Guesses and Sequence Attempts -->
+            <div style="margin-top: 20px; text-align: left;">
+                <h2>Participant Final Guesses and Sequence Attempts</h2>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr>
+                            <th style="border-bottom: 1px solid #a6a6a6; padding: 8px; text-align: left;">Final Guess</th>
+                            <th style="border-bottom: 1px solid #a6a6a6; padding: 8px; text-align: left;">Sequence Attempts</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for data in participants_data %}
+                            <tr>
+                                <td style="padding: 8px; border-bottom: 1px solid #a6a6a6;">{{ data.final_guess }}</td>
+                                <td style="padding: 8px; border-bottom: 1px solid #a6a6a6;">{{ data.sequences|safe }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

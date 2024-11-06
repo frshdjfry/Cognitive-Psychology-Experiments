@@ -1,7 +1,7 @@
 import matplotlib
 from django.shortcuts import render
 from django.http import HttpResponse
-from experiment.models import Response
+from experiment.models import Response, TwoFourSixSequenceAttempt, TwoFourSixFinalGuess
 from io import BytesIO
 import matplotlib.pyplot as plt
 matplotlib.use('Agg')
@@ -279,3 +279,62 @@ def generate_box_plot(estimates_a, estimates_b):
     plt.close(fig)  # Close the plot to free memory
 
     return chart_base64
+
+
+def two_four_six_results(request):
+    # Retrieve all sequence attempts
+    correct_attempts = TwoFourSixSequenceAttempt.objects.filter(fits_rule=True).count()
+    incorrect_attempts = TwoFourSixSequenceAttempt.objects.filter(fits_rule=False).count()
+
+    # Generate pie chart
+    chart = generate_pie_chart_246(correct_attempts, incorrect_attempts)
+
+    # Prepare table data
+    participants_data = []
+    final_guesses = TwoFourSixFinalGuess.objects.all()
+    for guess in final_guesses:
+        attempts = TwoFourSixSequenceAttempt.objects.filter(final_guess=guess)
+        sequence_list = [
+            f"<span style='color: {'green' if attempt.fits_rule else 'red'};'>{attempt.sequence}</span>"
+            for attempt in attempts
+        ]
+        participants_data.append({
+            "final_guess": guess.final_guess,
+            "sequences": ", ".join(sequence_list)
+        })
+
+    return render(request, 'experiment/two_four_six_results.html', {
+        'chart': chart,
+        'participants_data': participants_data
+    })
+
+
+def generate_pie_chart_246(correct, incorrect):
+    # Set up figure with transparent background
+    fig, ax = plt.subplots()
+    fig.patch.set_alpha(0.0)  # Transparent background
+
+    # Data and labels for the pie chart
+    data = [correct, incorrect]
+    labels = ['Correct Sequences', 'Incorrect Sequences']
+    colors = ['green', 'red']
+
+    # Plot pie chart
+    ax.pie(data, labels=labels, colors=colors, autopct='%1.1f%%', startangle=90)
+    ax.set_title("Correct vs Incorrect Sequence Attempts", color='#a6a6a6')
+
+    # Save chart to a PNG image in memory
+    buffer = BytesIO()
+    plt.savefig(buffer, format="png", transparent=True)
+    buffer.seek(0)
+    image_png = buffer.getvalue()
+    buffer.close()
+
+    # Encode the image to base64 for embedding in HTML
+    chart_base64 = base64.b64encode(image_png).decode("utf-8")
+    plt.close(fig)  # Close the plot to free memory
+
+    return chart_base64
+
+
+
