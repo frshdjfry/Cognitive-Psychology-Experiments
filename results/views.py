@@ -56,7 +56,11 @@ def generate_bar_chart(counts, correct_answers):
     colors = ['green' if option in correct_answers else 'red' for option in counts.keys()]
 
     # Bar chart
-    ax.bar(counts.keys(), counts.values(), color=colors)
+    titles = counts.keys()
+    answer_labels = []
+    for idx, t in enumerate(titles):
+        answer_labels.append(str(idx + 1))
+    ax.bar(answer_labels, counts.values(), color=colors)
     ax.set_title("Selections")
     ax.set_xlabel("Options")
     ax.set_ylabel("Number of Selections")
