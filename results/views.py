@@ -1,6 +1,8 @@
 import matplotlib
 from django.shortcuts import render
 from django.http import HttpResponse
+from matplotlib.patches import Patch
+
 from experiment.models import Response, TwoFourSixSequenceAttempt, TwoFourSixFinalGuess
 from io import BytesIO
 import matplotlib.pyplot as plt
@@ -337,4 +339,92 @@ def generate_pie_chart_246(correct, incorrect):
     return chart_base64
 
 
+def wason_timing_results(request):
+    # Correct answers for each group
+    correct_answers_a = ["A", "4"]
+    correct_answers_b = ["Drinking alcohol", "Under 21 years old"]
 
+    # Fetch and categorize response times by group and correctness
+    group_a_times = []
+    group_b_times = []
+    correct_times = []
+    incorrect_times = []
+
+    responses_a = Response.objects.filter(subject="Wason", participant__group="A")
+    responses_b = Response.objects.filter(subject="Wason", participant__group="B")
+
+    for response in responses_a:
+        response_time = response.response_time.total_seconds()  # Convert to seconds
+        group_a_times.append(response_time)
+
+        # Check correctness for Group A
+        answers = eval(response.answer)
+        if set(answers) == set(correct_answers_a):
+            response_time = response.response_time.total_seconds()  # Convert to seconds
+            correct_times.append(response_time)
+        else:
+            response_time = response.response_time.total_seconds()  # Convert to seconds
+            incorrect_times.append(response_time)
+
+    for response in responses_b:
+        response_time = response.response_time.total_seconds()  # Convert to seconds
+        group_b_times.append(response_time)
+
+        # Check correctness for Group B
+        answers = eval(response.answer)
+        if set(answers) == set(correct_answers_b):
+            response_time = response.response_time.total_seconds()  # Convert to seconds
+            correct_times.append(response_time)
+        else:
+            response_time = response.response_time.total_seconds()  # Convert to seconds
+            incorrect_times.append(response_time)
+
+    # Generate box plots
+    group_chart = generate_box_plot_wason([group_a_times, group_b_times], ["Group A", "Group B"], ["#87ceeb", "#4682b4"])
+    correctness_chart = generate_box_plot_wason([correct_times, incorrect_times], ["Correct", "Incorrect"], ["green", "red"])
+
+    return render(request, 'experiment/wason_timing_results.html', {
+        'group_chart': group_chart,
+        'correctness_chart': correctness_chart
+    })
+
+def generate_box_plot_wason(data, labels, colors):
+    # Set up figure with transparent background
+    fig, ax = plt.subplots()
+    fig.patch.set_alpha(0.0)  # Transparent background
+
+    # Plotting box plot
+    box = ax.boxplot(data, patch_artist=True, labels=labels)
+
+    # Set colors for each box and other elements
+    for patch, color in zip(box['boxes'], colors):
+        patch.set_facecolor(color)
+    plt.setp(box['medians'], color="white")  # Median in white
+    plt.setp(box['fliers'], markeredgecolor='#a6a6a6', markerfacecolor='#a6a6a6')  # Fliers in gray
+    plt.setp(box['whiskers'], color='#a6a6a6')
+    plt.setp(box['caps'], color='#a6a6a6')
+
+    # Styling and legend
+    ax.set_title("Response Time Distribution", color='#a6a6a6')
+    ax.set_ylabel("Response Time (seconds)", color='#a6a6a6')
+    ax.tick_params(colors='#a6a6a6')
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_color('#a6a6a6')
+    ax.spines['bottom'].set_color('#a6a6a6')
+
+    legend_elements = [Patch(facecolor=color, label=label) for color, label in zip(colors, labels)]
+    ax.legend(handles=legend_elements, loc="upper right", frameon=False, labelcolor='#a6a6a6')
+
+    # Save chart to a PNG image in memory
+    buffer = BytesIO()
+    plt.savefig(buffer, format="png", transparent=True)
+    buffer.seek(0)
+    image_png = buffer.getvalue()
+    buffer.close()
+
+    # Encode the image to base64 for embedding in HTML
+    chart_base64 = base64.b64encode(image_png).decode("utf-8")
+    plt.close(fig)  # Close the plot to free memory
+
+    return chart_base64
