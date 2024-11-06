@@ -1,4 +1,5 @@
 import matplotlib
+import numpy as np
 from django.shortcuts import render
 from django.http import HttpResponse
 from matplotlib.patches import Patch
@@ -7,8 +8,8 @@ from experiment.models import Response, TwoFourSixSequenceAttempt, TwoFourSixFin
 from io import BytesIO
 import matplotlib.pyplot as plt
 matplotlib.use('Agg')
-from django.core.files.base import ContentFile
 import base64
+from sklearn.linear_model import LinearRegression
 
 
 def wason_results(request):
@@ -473,3 +474,93 @@ def linda_timing_results(request):
         'correctness_chart': correctness_chart
     })
 
+def anchoring_timing_results(request):
+    # Correct answers for each group
+    correct_answer_threshold_a = 10  # Threshold for Group A's estimate being "correct" (arbitrary for illustration)
+    correct_answer_threshold_b = 80  # Threshold for Group B's estimate being "correct" (arbitrary for illustration)
+
+    # Fetch and categorize response times by group and correctness
+    group_a_times = []
+    group_b_times = []
+    time_amount_data = {'correct': {'times': [], 'amounts': []}, 'incorrect': {'times': [], 'amounts': []}}
+
+    responses_a = Response.objects.filter(subject="Anchoring", question_id="anchoring_number", participant__group="A")
+    responses_b = Response.objects.filter(subject="Anchoring", question_id="anchoring_number", participant__group="B")
+
+    for response in responses_a:
+        response_time = response.response_time.total_seconds()  # Convert timedelta to seconds
+        amount_estimated = int(response.answer)
+        group_a_times.append(response_time)
+
+        # Check correctness for Group A
+        if amount_estimated <= correct_answer_threshold_a:
+            time_amount_data['correct']['times'].append(response_time)
+            time_amount_data['correct']['amounts'].append(amount_estimated)
+        else:
+            time_amount_data['incorrect']['times'].append(response_time)
+            time_amount_data['incorrect']['amounts'].append(amount_estimated)
+
+    for response in responses_b:
+        response_time = response.response_time.total_seconds()  # Convert timedelta to seconds
+        amount_estimated = int(response.answer)
+        group_b_times.append(response_time)
+
+        # Check correctness for Group B
+        if amount_estimated >= correct_answer_threshold_b:
+            time_amount_data['correct']['times'].append(response_time)
+            time_amount_data['correct']['amounts'].append(amount_estimated)
+        else:
+            time_amount_data['incorrect']['times'].append(response_time)
+            time_amount_data['incorrect']['amounts'].append(amount_estimated)
+
+    # Generate box plot for response times by group
+    group_chart = generate_box_plot_wason([group_a_times, group_b_times], ["Group A", "Group B"], ["#87ceeb", "#4682b4"])
+    # Generate scatter plot with regression line for time vs. amount
+    scatter_chart = generate_scatter_plot_with_regression(time_amount_data)
+
+    return render(request, 'experiment/anchoring_timing_results.html', {
+        'group_chart': group_chart,
+        'scatter_chart': scatter_chart
+    })
+
+
+def generate_scatter_plot_with_regression(data):
+    # Set up figure with transparent background
+    fig, ax = plt.subplots()
+    fig.patch.set_alpha(0.0)  # Transparent background
+
+    # Plot all data points in a single color (e.g., blue)
+    all_times = data['correct']['times'] + data['incorrect']['times']
+    all_amounts = data['correct']['amounts'] + data['incorrect']['amounts']
+    ax.scatter(all_times, all_amounts, color="#4682b4", label="Estimates")  # Single color for all points
+
+    # Regression line
+    times = np.array(all_times).reshape(-1, 1)
+    amounts = np.array(all_amounts)
+    model = LinearRegression().fit(times, amounts)
+    regression_line = model.predict(times)
+    ax.plot(times, regression_line, color='#a6a6a6', linestyle="--")
+
+    # Styling and labels
+    ax.set_title("Time vs. Amount Estimated", color='#a6a6a6')
+    ax.set_xlabel("Response Time (seconds)", color='#a6a6a6')
+    ax.set_ylabel("Estimated Amount", color='#a6a6a6')
+    ax.tick_params(colors='#a6a6a6')
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_color('#a6a6a6')
+    ax.spines['bottom'].set_color('#a6a6a6')
+    ax.legend(frameon=False, labelcolor='#a6a6a6')
+
+    # Save chart to a PNG image in memory
+    buffer = BytesIO()
+    plt.savefig(buffer, format="png", transparent=True)
+    buffer.seek(0)
+    image_png = buffer.getvalue()
+    buffer.close()
+
+    # Encode the image to base64 for embedding in HTML
+    chart_base64 = base64.b64encode(image_png).decode("utf-8")
+    plt.close(fig)  # Close the plot to free memory
+
+    return chart_base64

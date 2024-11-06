@@ -1,0 +1,29 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Anchoring Bias Timing Results</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{% static 'experiment/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="form" style="width: 90%; max-width: 400px; text-align: center;">
+            <h1>Anchoring Bias Timing Results</h1>
+
+            <h2>Response Time by Group</h2>
+            <img src="data:image/png;base64,{{ group_chart }}" alt="Response Time by Group" style="width:100%;">
+
+            <h2>Time vs. Amount Estimated</h2>
+            <img src="data:image/png;base64,{{ scatter_chart }}" alt="Time vs Amount Estimated" style="width:100%;">
+
+            <!-- Hints for each group's question -->
+            <div style="margin-top: 20px; text-align: left;">
+                <h2>Group Hints</h2>
+                <p><strong>Group A:</strong> "Is the population of Turkey more than 10 million?" Followed by: "What do you think the population is?"</p>
+                <p><strong>Group B:</strong> "Is the population of Turkey more than 80 million?" Followed by: "What do you think the population is?"</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
