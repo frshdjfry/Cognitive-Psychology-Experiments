@@ -9,8 +9,9 @@ class Participant(models.Model):
 
 class Response(models.Model):
     participant = models.ForeignKey(Participant, on_delete=models.CASCADE)
-    subject = models.CharField(max_length=50)  # Wason, Linda, Framing, Anchoring
+    subject = models.CharField(max_length=50)
     question_id = models.CharField(max_length=50)
     answer = models.TextField()
+    response_time = models.DurationField(null=True, blank=True)  # New field for time tracking
     created_at = models.DateTimeField(auto_now_add=True)
 

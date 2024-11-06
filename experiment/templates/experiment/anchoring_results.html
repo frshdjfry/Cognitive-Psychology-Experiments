@@ -1,0 +1,30 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Anchoring Bias Results</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Responsive for mobile -->
+    <link rel="stylesheet" type="text/css" href="{% static 'experiment/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="form" style="width: 90%; max-width: 400px; text-align: center;">
+            <h1>Anchoring Bias Results</h1>
+            <img src="data:image/png;base64,{{ chart }}" alt="Anchoring Bias Box Plot" style="width:100%;">
+
+            <!-- Question and Options for Each Group -->
+            <div style="margin-top: 20px; text-align: left;">
+                <h2>Question and Options</h2>
+
+                <h3>Group A</h3>
+                <p>Is the population of Turkey more than <strong>10 million</strong>?</p>
+                <p><em>Follow-up:</em> What do you think the population of Turkey is?</p>
+
+                <h3>Group B</h3>
+                <p>Is the population of Turkey more than <strong>80 million</strong>?</p>
+                <p><em>Follow-up:</em> What do you think the population of Turkey is?</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

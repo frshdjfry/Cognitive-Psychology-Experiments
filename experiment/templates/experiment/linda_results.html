@@ -1,0 +1,41 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Linda Problem Results</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Responsive for mobile -->
+    <link rel="stylesheet" type="text/css" href="{% static 'experiment/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="form" style="width: 90%; max-width: 400px; text-align: center;">
+            <h1>Linda Problem Results</h1>
+
+            <h2>Group A Results</h2>
+            <img src="data:image/png;base64,{{ chart_a }}" alt="Group A Pie Chart" style="width:100%;">
+
+            <h2>Group B Results</h2>
+            <img src="data:image/png;base64,{{ chart_b }}" alt="Group B Pie Chart" style="width:100%;">
+
+            <hr>
+            <div style="margin-top: 20px; text-align: left;">
+                <h2>Question and Options</h2>
+
+                <h3>Group A</h3>
+                <p><strong>Question:</strong> Which is more probable?</p>
+                <ul>
+                    <li style="color: green;">Linda is a bank teller (Correct)</li>
+                    <li style="color: red;">Linda is a bank teller and active in the feminist movement (Incorrect)</li>
+                </ul>
+
+                <h3>Group B</h3>
+                <p><strong>Question:</strong> Out of 100 people like Linda, how many would be:</p>
+                <ul>
+                    <li style="color: green;">Greater number estimated for Linda is a bank teller (Correct)</li>
+                    <li style="color: red;">Greater number estimated for Linda is a bank teller and active in the feminist movement (Incorrect)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

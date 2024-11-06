@@ -1,0 +1,46 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Wason Task Results</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Responsive for mobile -->
+    <link rel="stylesheet" type="text/css" href="{% static 'experiment/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="form" style="width: 90%; max-width: 400px; text-align: center;">
+            <h1>Wason Task Results - Group A</h1>
+
+            <img src="data:image/png;base64,{{ chart_a }}" alt="Group A Chart" style="width:100%;">
+
+            <h1>Wason Task Results - Group B</h1>
+
+            <img src="data:image/png;base64,{{ chart_b }}" alt="Group B Chart" style="width:100%;">
+
+
+            <hr>
+            <div style="margin-top: 20px; text-align: left;">
+                <h2>Question and Options</h2>
+
+                <h3>Group A</h3>
+                <p><strong>Question:</strong> If a card has a vowel on one side, then it has an even number on the other side.</p>
+                <ul>
+                    <li style="color: green;">A (Correct)</li>
+                    <li style="color: red;">K (Incorrect)</li>
+                    <li style="color: green;">4 (Correct)</li>
+                    <li style="color: red;">7 (Incorrect)</li>
+                </ul>
+
+                <h3>Group B</h3>
+                <p><strong>Question:</strong> If someone is drinking alcohol, then they must be over 21 years old.</p>
+                <ul>
+                    <li style="color: green;">Drinking alcohol (Correct)</li>
+                    <li style="color: red;">Drinking a soft drink (Incorrect)</li>
+                    <li style="color: red;">Over 21 years old (Incorrect)</li>
+                    <li style="color: green;">Under 21 years old (Correct)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
