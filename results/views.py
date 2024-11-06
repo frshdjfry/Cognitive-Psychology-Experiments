@@ -428,3 +428,48 @@ def generate_box_plot_wason(data, labels, colors):
     plt.close(fig)  # Close the plot to free memory
 
     return chart_base64
+
+
+def linda_timing_results(request):
+    # Correct answers for each group
+    correct_answer_a = "Linda is a bank teller"
+    correct_answer_b = "Linda is a bank teller"
+
+    # Fetch and categorize response times by group and correctness
+    group_a_times = []
+    group_b_times = []
+    correct_times = []
+    incorrect_times = []
+
+    responses_a = Response.objects.filter(subject="Linda", participant__group="A")
+    responses_b = Response.objects.filter(subject="Linda", participant__group="B")
+
+    for response in responses_a:
+        response_time = response.response_time.total_seconds()  # Convert timedelta to seconds
+        group_a_times.append(response_time)
+
+        # Check correctness for Group A
+        if response.answer == correct_answer_a:
+            correct_times.append(response_time)
+        else:
+            incorrect_times.append(response_time)
+
+    for response in responses_b:
+        response_time = response.response_time.total_seconds()  # Convert timedelta to seconds
+        group_b_times.append(response_time)
+
+        # Check correctness for Group B
+        if response.answer == correct_answer_b:
+            correct_times.append(response_time)
+        else:
+            incorrect_times.append(response_time)
+
+    # Generate box plots
+    group_chart = generate_box_plot_wason([group_a_times, group_b_times], ["Group A", "Group B"], ["#87ceeb", "#4682b4"])
+    correctness_chart = generate_box_plot_wason([correct_times, incorrect_times], ["Correct", "Incorrect"], ["green", "red"])
+
+    return render(request, 'experiment/linda_timing_results.html', {
+        'group_chart': group_chart,
+        'correctness_chart': correctness_chart
+    })
+
