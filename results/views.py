@@ -415,7 +415,7 @@ def generate_box_plot_wason(data, labels, colors):
     ax.spines['bottom'].set_color('#a6a6a6')
 
     legend_elements = [Patch(facecolor=color, label=label) for color, label in zip(colors, labels)]
-    ax.legend(handles=legend_elements, loc="upper right", frameon=False, labelcolor='#a6a6a6')
+    ax.legend(handles=legend_elements, loc="upper right", bbox_to_anchor=(1.15, 1), frameon=False, labelcolor='#a6a6a6')
 
     # Save chart to a PNG image in memory
     buffer = BytesIO()
@@ -564,3 +564,47 @@ def generate_scatter_plot_with_regression(data):
     plt.close(fig)  # Close the plot to free memory
 
     return chart_base64
+
+
+def framing_timing_results(request):
+    # Define risk-averse answers for each group
+    risk_averse_answer_a = "200 people will be saved"
+    risk_averse_answer_b = "400 people will die"
+
+    # Fetch and categorize response times by group and risk preference
+    group_a_times = []
+    group_b_times = []
+    risk_averse_times = []
+    risk_seeking_times = []
+
+    responses_a = Response.objects.filter(subject="Framing", participant__group="A")
+    responses_b = Response.objects.filter(subject="Framing", participant__group="B")
+
+    for response in responses_a:
+        response_time = response.response_time.total_seconds()  # Convert timedelta to seconds
+        group_a_times.append(response_time)
+
+        # Check if response is risk-averse for Group A
+        if response.answer == risk_averse_answer_a:
+            risk_averse_times.append(response_time)
+        else:
+            risk_seeking_times.append(response_time)
+
+    for response in responses_b:
+        response_time = response.response_time.total_seconds()  # Convert timedelta to seconds
+        group_b_times.append(response_time)
+
+        # Check if response is risk-averse for Group B
+        if response.answer == risk_averse_answer_b:
+            risk_averse_times.append(response_time)
+        else:
+            risk_seeking_times.append(response_time)
+
+    # Generate box plots
+    group_chart = generate_box_plot_wason([group_a_times, group_b_times], ["Group A", "Group B"], ["#87ceeb", "#4682b4"])
+    risk_chart = generate_box_plot_wason([risk_averse_times, risk_seeking_times], ["Risk Averse", "Risk Seeking"], ["#4CAF50", "#FF6347"])
+
+    return render(request, 'experiment/framing_timing_results.html', {
+        'group_chart': group_chart,
+        'risk_chart': risk_chart
+    })
