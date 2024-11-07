@@ -47,12 +47,13 @@ def wason_task(request):
     return render(request, 'experiment/question_template.html', {
         'group': participant.group,
         'subject': 'Wason Selection Task',
-        'question': "If a card has a vowel on one side, then it has an even number on the other side." if participant.group == 'A' else "If someone is drinking alcohol, then they must be over 21 years old.",
-        'options': ['A', 'K', '4', '7'] if participant.group == 'A' else ['Drinking alcohol', 'Drinking a soft drink',
-                                                                          'Over 21 years old', 'Under 21 years old'],
+        'question': "Rule: If a card shows a triangle on one side, then it has a blue color on the other side. Select the options that could help check if the rule is violated or not." \
+            if participant.group == 'A' else \
+            "You are a health inspector at a social event, ensuring that pregnant attendees are not consuming alcohol. Select the options you would check to see if anyone is violating this rule.",
+        'options': ['Triangle', 'Square', 'Blue color', 'Red color'] \
+            if participant.group == 'A' else ['Pregnant', 'Not Pregnant', 'Drinking Water', 'Drinking Alcohol'],
         'multiple_choice': True
     })
-
 
 # Apply similar changes to other views
 
@@ -221,5 +222,3 @@ def two_four_six_experiment(request):
 
 def thanks_page(request):
     return render(request, 'experiment/thanks.html')
-
-

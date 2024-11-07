@@ -14,15 +14,15 @@ from sklearn.linear_model import LinearRegression
 
 def wason_results(request):
     # Define correct answers for each group
-    correct_answers_a = ["A", "4"]
-    correct_answers_b = ["Drinking alcohol", "Under 21 years old"]
+    correct_answers_a = ["Triangle", "Red color"]
+    correct_answers_b = ["Pregnant", "Drinking Alcohol"]
 
     # Get responses for each group
     responses_a = Response.objects.filter(subject="Wason", question_id="wason_q", participant__group="A")
     responses_b = Response.objects.filter(subject="Wason", question_id="wason_q", participant__group="B")
 
     # Count selections for each option in Group A
-    options_a = ['A', 'K', '4', '7']
+    options_a = ['Triangle', 'Square', 'Blue color', 'Red color']
     counts_a = {option: 0 for option in options_a}
     for response in responses_a:
         selected_options = eval(response.answer)  # Assuming the answer is stored as a list of choices
@@ -30,7 +30,7 @@ def wason_results(request):
             counts_a[option] += 1
 
     # Count selections for each option in Group B
-    options_b = ['Drinking alcohol', 'Drinking a soft drink', 'Over 21 years old', 'Under 21 years old']
+    options_b = ['Pregnant', 'Not Pregnant', 'Drinking Water', 'Drinking Alcohol']
     counts_b = {option: 0 for option in options_b}
     for response in responses_b:
         selected_options = eval(response.answer)  # Assuming the answer is stored as a list of choices
@@ -346,8 +346,8 @@ def generate_pie_chart_246(correct, incorrect):
 
 def wason_timing_results(request):
     # Correct answers for each group
-    correct_answers_a = ["A", "4"]
-    correct_answers_b = ["Drinking alcohol", "Under 21 years old"]
+    correct_answers_a = ["Triangle", "Red color"]
+    correct_answers_b = ["Pregnant", "Drinking Alcohol"]
 
     # Fetch and categorize response times by group and correctness
     group_a_times = []
