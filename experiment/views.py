@@ -112,7 +112,7 @@ def framing_effect(request):
         # Save response with response time
         Response.objects.create(
             participant=participant,
-            subject="Framing",
+            subject="Framing Problem",
             question_id="framing_q",
             answer=answer,
             response_time=response_time
@@ -124,8 +124,9 @@ def framing_effect(request):
 
     return render(request, 'experiment/question_template.html', {
         'group': participant.group,
-        'subject': 'Framing Effect',
-        'question': "Which option would you choose?",
+        'subject': 'Risk Problem',
+        'question': "A deadly disease outbreak is expected to kill 600 people. Two treatment options are available. "
+        "Which option would you choose?",
         'options': ["200 people will be saved",
                     "There’s a 33% chance that all 600 will be saved, and a 67% chance that no one will be saved."] if participant.group == 'A' else [
             "400 people will die",
@@ -166,7 +167,7 @@ def anchoring_bias(request):
 
     return render(request, 'experiment/question_template.html', {
         'group': participant.group,
-        'subject': 'Anchoring Bias',
+        'subject': 'Estimation Problem',
         'question': "Is the population of Turkey more than 10 million?" if participant.group == 'A' else "Is the population of Turkey more than 80 million?",
         'options': ['Yes', 'No'],
         'multiple_choice': False,
